@@ -57,17 +57,17 @@ cd to-do-list
 
 ### 2. Launch the Application
 
-No external build tools or web servers are required. Open `login.html` directly in any modern browser:
+No external build tools or web servers are required. Open `index.html` directly in any modern browser:
 
-* **macOS**: `open login.html`
+* **macOS**: `open index.html`
 
-* **Linux**: `xdg-open login.html`
+* **Linux**: `xdg-open index.html`
 
-* **Windows**: `start login.html`
+* **Windows**: `start index.html`
 
 ## 🔑 Demo Credentials
 
-To access the task dashboard via `login.html`:
+To access the task dashboard via `index.html`:
 
 | Field | Value | 
  | ----- | ----- | 
