@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List Dashboard</title>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="dashboard-card">
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>To Do List</h1>
+            <p id="dateDisplay">Wednesday, Nov 29</p>
+        </div>
+
+        <!-- Input -->
+        <div class="input-area">
+            <input 
+                type="text" 
+                id="taskInput" 
+                class="pill-input" 
+                placeholder="Write here..." 
+                autocomplete="off"
+            >
+            <button class="add-btn" onclick="addTask()">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <!-- Filter Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-pill active" onclick="filterTasks('all')">All</div>
+            <div class="stat-pill" onclick="filterTasks('active')">Active</div>
+            <div class="stat-pill" onclick="filterTasks('completed')">Completed</div>
+        </div>
+
+        <!-- Task List Area -->
+        <div class="task-list" id="taskList">
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state">
+                <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>No tasks yet.</p>
+            </div>
+            
+            <!-- Tasks are added here by JS -->
+        </div>
+
+        <!-- Footer with Contact and Logout Link -->
+        <div class="footer">
+            <a href="contact.html" class="contact-link">
+                <i class="fas fa-envelope"></i> Contact Support
+            </a>
+            <span style="color: var(--text-gray); opacity: 0.5;">|</span>
+            <a href="index.html" class="contact-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Date Setup
+        const dateOptions = { weekday: 'long', month: 'short', day: 'numeric' };
+        document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', dateOptions);
+
+        // 2. Task Logic
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+        const emptyState = document.getElementById('emptyState');
+        let currentFilter = 'all';
+
+        // Listen for Enter key
+        taskInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTask();
+        });
+
+        function addTask() {
+            const text = taskInput.value.trim();
+            if (text === "") return;
+
+            // Hide empty state
+            emptyState.style.display = 'none';
+
+            // Create Row Container
+            const row = document.createElement('div');
+            row.className = 'task-row';
+
+            // Create Blue Bubble
+            const bubble = document.createElement('div');
+            bubble.className = 'task-bubble';
+            
+            // Check Circle
+            const check = document.createElement('div');
+            check.className = 'check-circle';
+            check.innerHTML = '<i class="fas fa-check"></i>';
+            check.onclick = (e) => {
+                e.stopPropagation();
+                toggleDone(row);
+            };
+
+            // Text
+            const span = document.createElement('span');
+            span.className = 'task-text';
+            span.innerText = text;
+            span.onclick = () => toggleDone(row); 
+
+            // Append to Bubble
+            bubble.appendChild(check);
+            bubble.appendChild(span);
+
+            // Create Delete Button (Outside)
+            const delBtn = document.createElement('button');
+            delBtn.className = 'del-btn';
+            delBtn.innerHTML = '<i class="fas fa-times"></i>';
+            delBtn.onclick = () => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(20px)';
+                setTimeout(() => {
+                    row.remove();
+                    checkEmptyState();
+                }, 300);
+            };
+
+            // Assemble Row
+            row.appendChild(bubble);
+            row.appendChild(delBtn);
+
+            // Add to list
+            taskList.prepend(row);
+
+            // Clear input
+            taskInput.value = "";
+            
+            // Re-apply filter in case we added while in 'completed' view
+            applyFilter();
+        }
+
+        function toggleDone(row) {
+            row.classList.toggle('done');
+            applyFilter(); 
+        }
+
+        function checkEmptyState() {
+            // Count visible rows
+            const rows = taskList.querySelectorAll('.task-row');
+            if (rows.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // 3. Filter Logic
+        window.filterTasks = function(filterType) {
+            currentFilter = filterType;
+
+            // Update UI pills
+            const pills = document.querySelectorAll('.stat-pill');
+            pills.forEach(pill => pill.classList.remove('active'));
+            event.target.classList.add('active');
+
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const rows = document.querySelectorAll('.task-row');
+            
+            rows.forEach(row => {
+                switch(currentFilter) {
+                    case 'all':
+                        row.style.display = 'flex';
+                        break;
+                    case 'active':
+                        if(row.classList.contains('done')) row.style.display = 'none';
+                        else row.style.display = 'flex';
+                        break;
+                    case 'completed':
+                        if(!row.classList.contains('done')) row.style.display = 'none';
+                        else row.style.display = 'flex';
+                        break;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
